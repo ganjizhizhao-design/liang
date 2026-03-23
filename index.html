@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>濒危物种 | 碎片中的生命</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            overflow: hidden;
+            color: #333;
+            transition: background-color 0.8s ease;
+        }
+
+        .main-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .intro-slide {
+            flex-direction: row;
+            text-align: left;
+            background: linear-gradient(180deg, #ffffff 0%, #f0f0f0 50%, #e0e0e0 100%);
+            color: #333;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .intro-slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.9) 0%, transparent 50%),
+                radial-gradient(ellipse at 20% 50%, rgba(240,240,240,0.3) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .intro-left {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px;
+            max-width: 45%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .intro-header { margin-bottom: 60px; }
+
+        .intro-title {
+            font-size: 4.5rem;
+            font-weight: 900;
+            letter-spacing: 12px;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .intro-subtitle {
+            font-size: 1.4rem;
+            font-weight: 300;
+            color: #666;
+            letter-spacing: 6px;
+        }
+
+        .intro-message {
+            font-size: 1rem;
+            font-weight: 300;
+            color: #999;
+            letter-spacing: 2px;
+            margin-bottom: 50px;
+            line-height: 2;
+        }
+
+        .start-btn {
+            display: inline-block;
+            padding: 20px 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 4px;
+            background: #333;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: fit-content;
+        }
+
+        .start-btn:hover {
+            background: #555;
+            transform: translateX(10px);
+        }
+
+        .intro-right {
+            flex: 1;
+            height: 100%;
+            position: relative;
+            background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 50%, #e8e8e8 100%);
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .intro-scene {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .lp-mountain-far {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 120px solid transparent;
+            border-right: 120px solid transparent;
+            border-bottom: 180px solid #7fb685;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+        .lp-mountain-far::before {
+            content: '';
+            position: absolute;
+            left: -60px;
+            top: 80px;
+            width: 0;
+            height: 0;
+            border-left: 60px solid transparent;
+            border-right: 60px solid transparent;
+            border-bottom: 80px solid #9ccda0;
+        }
+        .lp-mt-far-1 { left: 5%; bottom: 25%; transform: scale(0.8); opacity: 0.7; }
+        .lp-mt-far-2 { left: 30%; bottom: 20%; transform: scale(1.2); opacity: 0.6; }
+        .lp-mt-far-3 { right: 10%; bottom: 22%; transform: scale(0.9); opacity: 0.65; }
+
+        .lp-mountain-near {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 100px solid transparent;
+            border-right: 100px solid transparent;
+            border-bottom: 140px solid #5a9e5f;
+        }
+        .lp-mountain-near::after {
+            content: '';
+            position: absolute;
+            left: -40px;
+            top: 60px;
+            width: 0;
+            height: 0;
+            border-left: 40px solid transparent;
+            border-right: 40px solid transparent;
+            border-bottom: 60px solid #6eb56f;
+        }
+        .lp-mt-near-1 { left: 15%; bottom: 15%; opacity: 0.8; }
+        .lp-mt-near-2 { right: 20%; bottom: 18%; transform: scale(1.1); opacity: 0.75; }
+
+        .lp-water {
+            position: absolute;
+            bottom: 8%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 60px;
+        }
+        .lp-water-triangle {
+            position: absolute;
+            width: 0;
+            height: 0;
+            opacity: 0.5;
+        }
+        .lp-w-1 { border-left: 80px solid transparent; border-right: 80px solid transparent; border-bottom: 30px solid #7fcdcd; left: 0; top: 0; }
+        .lp-w-2 { border-left: 60px solid transparent; border-right: 60px solid transparent; border-bottom: 25px solid #9fd4d4; left: 100px; top: 10px; }
+        .lp-w-3 { border-left: 70px solid transparent; border-right: 70px solid transparent; border-bottom: 35px solid #6bc4c4; left: 180px; top: 5px; }
+        .lp-w-4 { border-left: 50px solid transparent; border-right: 50px solid transparent; border-bottom: 20px solid #b8e0e0; left: 280px; top: 15px; }
+        .lp-w-5 { border-left: 40px solid transparent; border-right: 40px solid transparent; border-bottom: 28px solid #8ddada; left: 320px; top: 0; }
+
+        .lp-pine {
+            position: absolute;
+            width: 0;
+            height: 0;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.15));
+        }
+        .lp-pine-top {
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-bottom: 50px solid #3d6b42;
+        }
+        .lp-pine-mid {
+            border-left: 30px solid transparent;
+            border-right: 30px solid transparent;
+            border-bottom: 40px solid #4a7d52;
+            position: absolute;
+            top: 35px;
+            left: -30px;
+        }
+        .lp-pine-base {
+            border-left: 35px solid transparent;
+            border-right: 35px solid transparent;
+            border-bottom: 35px solid #5a8f62;
+            position: absolute;
+            top: 65px;
+            left: -35px;
+        }
+        .lp-pine-trunk {
+            position: absolute;
+            width: 8px;
+            height: 20px;
+            background: #5d4037;
+            top: 95px;
+            left: -4px;
+        }
+        .lp-pine-1 { left: 8%; bottom: 20%; transform: scale(0.9); }
+        .lp-pine-2 { left: 22%; bottom: 18%; transform: scale(1.1); }
+        .lp-pine-3 { right: 12%; bottom: 22%; transform: scale(0.8); }
+        .lp-pine-4 { right: 28%; bottom: 16%; transform: scale(1.2); }
+
+        .lp-bamboo {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .lp-bamboo-segment {
+            width: 6px;
+            height: 25px;
+            background: linear-gradient(90deg, #558b2f 0%, #7cb342 50%, #558b2f 100%);
+            position: relative;
+        }
+        .lp-bamboo-segment::before {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 3px;
+            background: #33691e;
+            left: -2px;
+            top: 0;
+        }
+        .lp-bamboo-leaf {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-bottom: 8px solid #689f38;
+        }
+        .lp-bamboo-1 { left: 5%; bottom: 25%; transform: scale(0.9); }
+        .lp-bamboo-1 .lp-bamboo-leaf { top: 10px; left: 5px; transform: rotate(-30deg); }
+        .lp-bamboo-2 { left: 35%; bottom: 28%; transform: scale(1.1); }
+        .lp-bamboo-2 .lp-bamboo-leaf { top: 20px; left: -10px; transform: rotate(20deg); }
+        .lp-bamboo-3 { right: 8%; bottom: 24%; transform: scale(0.85); }
+
+        .lp-tree {
+            position: absolute;
+            filter: drop-shadow(2px 3px 5px rgba(0,0,0,0.12));
+        }
+        .lp-tree-crown {
+            width: 0;
+            height: 0;
+            border-left: 40px solid transparent;
+            border-right: 40px solid transparent;
+            border-bottom: 70px solid #4caf50;
+            position: relative;
+        }
+        .lp-tree-crown::before {
+            content: '';
+            position: absolute;
+            left: -25px;
+            top: 30px;
+            width: 0;
+            height: 0;
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-bottom: 50px solid #66bb6a;
+        }
+        .lp-tree-crown::after {
+            content: '';
+            position: absolute;
+            left: -15px;
+            top: 55px;
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 35px solid #81c784;
+        }
+        .lp-tree-trunk {
+            width: 10px;
+            height: 25px;
+            background: linear-gradient(90deg, #5d4037 0%, #8d6e63 50%, #5d4037 100%);
+            margin: 0 auto;
+        }
+        .lp-tree-1 { left: 45%; bottom: 18%; transform: scale(0.9); }
+        .lp-tree-2 { right: 5%; bottom: 20%; transform: scale(0.7); }
+
+        .intro-animals {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 30px;
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            width: 90%;
+        }
+
+        .intro-animal {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .intro-animal:hover {
+            transform: translateY(-20px) scale(1.15);
+        }
+
+        .animal-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #555;
+            letter-spacing: 1px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .slide-content {
+            display: flex;
+            width: 90%;
+            max-width: 1400px;
+            height: 80%;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .animal-stage {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            height: 100%;
+        }
+
+        .animal-wrapper {
+            position: relative;
+            width: 450px;
+            height: 450px;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            z-index: 1;
+        }
+
+        .poly-face {
+            position: absolute;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+        }
+
+        .poly-face:hover {
+            filter: brightness(1.15);
+            transform: translateZ(8px) scale(1.02);
+        }
+
+        .slide.active .poly-face {
+            opacity: 1;
+        }
+
+        .info-panel {
+            flex: 1;
+            padding: 40px;
+            max-width: 520px;
+        }
+
+        .species-number {
+            font-size: 6rem;
+            font-weight: 200;
+            line-height: 1;
+            opacity: 0.06;
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            letter-spacing: -5px;
+        }
+
+        .species-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 8px;
+            position: relative;
+        }
+
+        .species-pinyin {
+            font-size: 0.5em;
+            font-weight: 300;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 1px;
+            margin-left: 8px;
+        }
+
+        .species-latin {
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 24px;
+            letter-spacing: 2px;
+            font-style: italic;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 20px;
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+            border: 1px solid;
+        }
+
+        .status-critical { color: #e74c3c; border-color: #e74c3c; }
+        .status-endangered { color: #e67e22; border-color: #e67e22; }
+        .status-vulnerable { color: #f1c40f; border-color: #f1c40f; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .info-item {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-label {
+            font-size: 0.6rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: #fff;
+        }
+
+        .info-value.highlight {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .species-desc {
+            font-size: 0.85rem;
+            font-weight: 300;
+            line-height: 2;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 24px;
+        }
+
+        .habitat-section {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .habitat-title {
+            font-size: 0.6rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .habitat-value {
+            font-size: 0.8rem;
+            font-weight: 300;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.8;
+        }
+
+        .nav-dots {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 6px;
+            height: 6px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot:hover { transform: scale(1.5); }
+        .nav-dot.active { background: #333; border-color: #333; }
+        body:has(.slide.active:not(.intro-slide)) .nav-dot.active { background: #fff; border-color: #fff; }
+
+        .nav-arrows {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .nav-arrow {
+            width: 50px;
+            height: 50px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            pointer-events: auto;
+            font-size: 1rem;
+            color: rgba(0, 0, 0, 0.3);
+            background: transparent;
+        }
+
+        body:has(.slide.active:not(.intro-slide)) .nav-arrow {
+            border-color: rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .nav-arrow:hover {
+            border-color: rgba(0, 0, 0, 0.4);
+            color: #333;
+        }
+
+        body:has(.slide.active:not(.intro-slide)) .nav-arrow:hover {
+            border-color: rgba(255, 255, 255, 0.6);
+            color: #fff;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 30px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 6px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        body:has(.slide.active:not(.intro-slide)) .logo { color: rgba(255,255,255,0.8); }
+        .logo:hover { opacity: 0.7; }
+        .logo span { font-weight: 300; color: #999; }
+        body:has(.slide.active:not(.intro-slide)) .logo span { color: rgba(255,255,255,0.4); }
+
+        .counter {
+            font-size: 0.8rem;
+            font-weight: 400;
+            letter-spacing: 3px;
+            color: #999;
+        }
+
+        body:has(.slide.active:not(.intro-slide)) .counter { color: rgba(255,255,255,0.4); }
+        .counter .current { color: #333; font-size: 1rem; font-weight: 700; }
+        body:has(.slide.active:not(.intro-slide)) .counter .current { color: #fff; }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 1px;
+            background: #333;
+            transition: width 0.5s ease;
+        }
+
+        body:has(.slide.active:not(.intro-slide)) .progress-bar { background: rgba(255,255,255,0.8); }
+
+        .click-ripple {
+            position: fixed;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.1);
+            pointer-events: none;
+            animation: ripple 0.6s ease-out forwards;
+            z-index: 9999;
+        }
+
+        body:has(.slide.active:not(.intro-slide)) .click-ripple { background: rgba(255, 255, 255, 0.2); }
+
+        @keyframes ripple {
+            0% { width: 0; height: 0; opacity: 1; }
+            100% { width: 80px; height: 80px; opacity: 0; }
+        }
+
+        @media (max-width: 1024px) {
+            .slide-content { flex-direction: column; justify-content: center; text-align: center; }
+            .animal-wrapper { width: 280px; height: 280px; }
+            .info-panel { padding: 20px; max-width: 100%; }
+            .species-title { font-size: 2.2rem; }
+            .info-grid { grid-template-columns: 1fr; }
+            .nav-arrows { padding: 0 15px; }
+            .nav-arrow { width: 40px; height: 40px; }
+            .intro-slide { flex-direction: column; }
+            .intro-left { max-width: 100%; padding: 40px 20px; }
+            .intro-title { font-size: 2.5rem; }
+            .intro-right { display: none; }
+            .intro-animals { grid-template-columns: repeat(5, 1fr); gap: 10px; }
+        }
+
+        @keyframes float3d {
+            0%, 100% { transform: translateY(0) rotateY(0deg) rotateX(0deg); }
+            25% { transform: translateY(-10px) rotateY(2deg) rotateX(1deg); }
+            50% { transform: translateY(-5px) rotateY(0deg) rotateX(2deg); }
+            75% { transform: translateY(-15px) rotateY(-2deg) rotateX(0deg); }
+        }
+
+        .floating { animation: float3d 6s ease-in-out infinite; }
+
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            border-radius: 50%;
+            animation: particleFade 0.8s ease-out forwards;
+        }
+
+        @keyframes particleFade {
+            0% { opacity: 0.8; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0) translateY(-30px); }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo" onclick="goToSlide(0)">IN <span>PIECES</span></div>
+        <div class="counter"><span class="current">00</span> / 10</div>
+    </header>
+
+    <div class="main-container" id="mainContainer"></div>
+
+    <div class="nav-arrows" id="navArrows" style="display: none;">
+        <div class="nav-arrow" onclick="prevSlide()">←</div>
+        <div class="nav-arrow" onclick="nextSlide()">→</div>
+    </div>
+
+    <div class="nav-dots" id="navDots"></div>
+
+    <div class="progress-bar" id="progressBar"></div>
+
+    <script>
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playTone(frequency, duration, volume, type = 'sine') {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+            gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+
+        function playClickSound() {
+            playTone(700, 0.05, 0.15);
+        }
+
+        function playAnimalSound(speciesId) {
+            audioContext.resume();
+            
+            const sounds = {
+                panda: () => {
+                    for (let i = 0; i < 3; i++) {
+                        setTimeout(() => {
+                            const osc = audioContext.createOscillator();
+                            const gain = audioContext.createGain();
+                            const filter = audioContext.createBiquadFilter();
+                            osc.connect(filter);
+                            filter.connect(gain);
+                            gain.connect(audioContext.destination);
+                            osc.type = 'sawtooth';
+                            osc.frequency.setValueAtTime(180, audioContext.currentTime);
+                            osc.frequency.exponentialRampToValueAtTime(120, audioContext.currentTime + 0.4);
+                            filter.type = 'lowpass';
+                            filter.frequency.value = 600;
+                            gain.gain.setValueAtTime(0.12, audioContext.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                            osc.start(audioContext.currentTime);
+                            osc.stop(audioContext.currentTime + 0.5);
+                        }, i * 450);
+                    }
+                },
+                tiger: () => {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    const filter = audioContext.createBiquadFilter();
+                    osc.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(audioContext.destination);
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(80, audioContext.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(45, audioContext.currentTime + 1.5);
+                    filter.type = 'lowpass';
+                    filter.frequency.value = 300;
+                    gain.gain.setValueAtTime(0.18, audioContext.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.25, audioContext.currentTime + 0.4);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.8);
+                    osc.start(audioContext.currentTime);
+                    osc.stop(audioContext.currentTime + 1.8);
+                },
+                elephant: () => {
+                    for (let i = 0; i < 2; i++) {
+                        setTimeout(() => {
+                            const osc = audioContext.createOscillator();
+                            const gain = audioContext.createGain();
+                            const filter = audioContext.createBiquadFilter();
+                            osc.connect(filter);
+                            filter.connect(gain);
+                            gain.connect(audioContext.destination);
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(70 + i * 15, audioContext.currentTime);
+                            osc.frequency.exponentialRampToValueAtTime(35, audioContext.currentTime + 1.8);
+                            filter.type = 'lowpass';
+                            filter.frequency.value = 250;
+                            gain.gain.setValueAtTime(0.22, audioContext.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2);
+                            osc.start(audioContext.currentTime);
+                            osc.stop(audioContext.currentTime + 2);
+                        }, i * 250);
+                    }
+                },
+                penguin: () => {
+                    for (let i = 0; i < 5; i++) {
+                        setTimeout(() => {
+                            const osc = audioContext.createOscillator();
+                            const gain = audioContext.createGain();
+                            osc.connect(gain);
+                            gain.connect(audioContext.destination);
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(550, audioContext.currentTime);
+                            osc.frequency.exponentialRampToValueAtTime(750, audioContext.currentTime + 0.12);
+                            gain.gain.setValueAtTime(0.12, audioContext.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.18);
+                            osc.start(audioContext.currentTime);
+                            osc.stop(audioContext.currentTime + 0.18);
+                        }, i * 180);
+                    }
+                },
+                dolphin: () => {
+                    for (let i = 0; i < 6; i++) {
+                        setTimeout(() => {
+                            const osc = audioContext.createOscillator();
+                            const gain = audioContext.createGain();
+                            osc.connect(gain);
+                            gain.connect(audioContext.destination);
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(700 + i * 180, audioContext.currentTime);
+                            osc.frequency.exponentialRampToValueAtTime(1400 + i * 80, audioContext.currentTime + 0.12);
+                            gain.gain.setValueAtTime(0.1, audioContext.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.18);
+                            osc.start(audioContext.currentTime);
+                            osc.stop(audioContext.currentTime + 0.18);
+                        }, i * 120);
+                    }
+                },
+                owl: () => {
+                    for (let i = 0; i < 4; i++) {
+                        setTimeout(() => {
+                            const osc = audioContext.createOscillator();
+                            const gain = audioContext.createGain();
+                            osc.connect(gain);
+                            gain.connect(audioContext.destination);
+                            osc.type = 'triangle';
+                            osc.frequency.setValueAtTime(380, audioContext.currentTime);
+                            osc.frequency.setValueAtTime(320, audioContext.currentTime + 0.18);
+                            osc.frequency.setValueAtTime(380, audioContext.currentTime + 0.36);
+                            gain.gain.setValueAtTime(0.12, audioContext.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.6);
+                            osc.start(audioContext.currentTime);
+                            osc.stop(audioContext.currentTime + 0.6);
+                        }, i * 700);
+                    }
+                },
+                turtle: () => {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    const filter = audioContext.createBiquadFilter();
+                    osc.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(audioContext.destination);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(180, audioContext.currentTime);
+                    osc.frequency.linearRampToValueAtTime(120, audioContext.currentTime + 0.6);
+                    filter.type = 'lowpass';
+                    filter.frequency.value = 400;
+                    gain.gain.setValueAtTime(0.08, audioContext.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.7);
+                    osc.start(audioContext.currentTime);
+                    osc.stop(audioContext.currentTime + 0.7);
+                },
+                orca: () => {
+                    for (let i = 0; i < 5; i++) {
+                        setTimeout(() => {
+                            const osc = audioContext.createOscillator();
+                            const gain = audioContext.createGain();
+                            osc.connect(gain);
+                            gain.connect(audioContext.destination);
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(280 + i * 80, audioContext.currentTime);
+                            osc.frequency.exponentialRampToValueAtTime(550 + i * 40, audioContext.currentTime + 0.35);
+                            osc.frequency.exponentialRampToValueAtTime(180, audioContext.currentTime + 0.7);
+                            gain.gain.setValueAtTime(0.15, audioContext.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.9);
+                            osc.start(audioContext.currentTime);
+                            osc.stop(audioContext.currentTime + 0.9);
+                        }, i * 350);
+                    }
+                },
+                snowleopard: () => {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    const filter = audioContext.createBiquadFilter();
+                    osc.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(audioContext.destination);
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(130, audioContext.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(65, audioContext.currentTime + 1);
+                    filter.type = 'bandpass';
+                    filter.frequency.value = 450;
+                    gain.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.2);
+                    osc.start(audioContext.currentTime);
+                    osc.stop(audioContext.currentTime + 1.2);
+                },
+                goldenmonkey: () => {
+                    for (let i = 0; i < 6; i++) {
+                        setTimeout(() => {
+                            const osc = audioContext.createOscillator();
+                            const gain = audioContext.createGain();
+                            osc.connect(gain);
+                            gain.connect(audioContext.destination);
+                            osc.type = 'sine';
+                            osc.frequency.setValueAtTime(450 + Math.random() * 180, audioContext.currentTime);
+                            osc.frequency.exponentialRampToValueAtTime(280, audioContext.currentTime + 0.12);
+                            gain.gain.setValueAtTime(0.1, audioContext.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.18);
+                            osc.start(audioContext.currentTime);
+                            osc.stop(audioContext.currentTime + 0.18);
+                        }, i * 140);
+                    }
+                }
+            };
+
+            if (sounds[speciesId]) {
+                sounds[speciesId]();
+            }
+        }
+
+        const speciesData = [
+            {
+                id: 'panda',
+                name: '大熊猫',
+                pinyin: 'Dàxióngmāo',
+                latin: 'Ailuropoda melanoleuca',
+                status: '易危',
+                statusClass: 'status-vulnerable',
+                count: '1,864',
+                lifespan: '20-30年',
+                weight: '70-125kg',
+                diet: '竹子',
+                habitat: '中国中部山区竹林，主要分布在四川、陕西和甘肃的高山深谷地区',
+                desc: '大熊猫是中国特有的珍稀动物，被誉为"国宝"。它们主要以竹子为食，每天需要花费12-16小时进食。',
+                bgColor: '#808080',
+                faces: [
+                    { points: [[42,8],[58,8],[50,22]], color: '#faf0e6', z: 20, delay: 0 },
+                    { points: [[32,10],[45,10],[38,25]], color: '#faf0e6', z: 18, delay: 0.05 },
+                    { points: [[55,10],[68,10],[62,25]], color: '#faf0e6', z: 18, delay: 0.08 },
+                    { points: [[18,15],[38,28],[12,38]], color: '#1a1a1a', z: 16, delay: 0.12 },
+                    { points: [[62,28],[82,15],[88,38]], color: '#1a1a1a', z: 16, delay: 0.15 },
+                    { points: [[28,22],[72,22],[50,48]], color: '#f5f5dc', z: 22, delay: 0.18 },
+                    { points: [[22,32],[48,48],[15,55]], color: '#f5f5dc', z: 20, delay: 0.22 },
+                    { points: [[52,48],[78,32],[85,55]], color: '#f5f5dc', z: 20, delay: 0.25 },
+                    { points: [[30,35],[42,35],[36,48]], color: '#1a1a1a', z: 24, delay: 0.28 },
+                    { points: [[58,35],[70,35],[64,48]], color: '#1a1a1a', z: 24, delay: 0.32 },
+                    { points: [[42,45],[58,45],[50,58]], color: '#1a1a1a', z: 22, delay: 0.35 },
+                    { points: [[25,50],[75,50],[50,75]], color: '#fff8e7', z: 18, delay: 0.38 },
+                    { points: [[15,58],[42,75],[8,85]], color: '#1a1a1a', z: 14, delay: 0.42 },
+                    { points: [[58,75],[85,58],[92,85]], color: '#1a1a1a', z: 14, delay: 0.45 },
+                    { points: [[32,72],[68,72],[50,92]], color: '#faf0e6', z: 16, delay: 0.48 },
+                    { points: [[22,85],[48,95],[12,100]], color: '#1a1a1a', z: 12, delay: 0.52 },
+                    { points: [[52,95],[78,85],[88,100]], color: '#1a1a1a', z: 12, delay: 0.55 },
+                ]
+            },
+            {
+                id: 'tiger',
+                name: '华南虎',
+                pinyin: 'Huánánhǔ',
+                latin: 'Panthera tigris amoyensis',
+                status: '极危',
+                statusClass: 'status-critical',
+                count: '0',
+                lifespan: '15-20年',
+                weight: '150-200kg',
+                diet: '野猪、鹿类',
+                habitat: '原分布于中国黄河流域以南的广阔森林，现野外功能性灭绝',
+                desc: '华南虎是中国特有的虎亚种，曾广泛分布于中国南部。目前仅存于动物园中，是世界上最濒危的虎亚种。',
+                bgColor: '#e74c3c',
+                faces: [
+                    { points: [[30,5],[50,2],[40,18]], color: '#f39c12', z: 22, delay: 0 },
+                    { points: [[50,2],[70,5],[60,18]], color: '#f39c12', z: 22, delay: 0.05 },
+                    { points: [[18,8],[35,18],[22,32]], color: '#d35400', z: 20, delay: 0.08 },
+                    { points: [[65,18],[82,8],[78,32]], color: '#d35400', z: 20, delay: 0.12 },
+                    { points: [[12,12],[28,22],[15,38]], color: '#1a1a1a', z: 18, delay: 0.15 },
+                    { points: [[72,22],[88,12],[85,38]], color: '#1a1a1a', z: 18, delay: 0.18 },
+                    { points: [[25,22],[75,22],[50,48]], color: '#e67e22', z: 24, delay: 0.22 },
+                    { points: [[22,35],[50,48],[18,55]], color: '#f5b041', z: 22, delay: 0.25 },
+                    { points: [[50,48],[78,35],[82,55]], color: '#f5b041', z: 22, delay: 0.28 },
+                    { points: [[35,38],[48,38],[42,52]], color: '#fef9e7', z: 26, delay: 0.32 },
+                    { points: [[52,38],[65,38],[58,52]], color: '#fef9e7', z: 26, delay: 0.35 },
+                    { points: [[42,45],[58,45],[50,58]], color: '#1a1a1a', z: 28, delay: 0.38 },
+                    { points: [[32,52],[68,52],[50,72]], color: '#f8c471', z: 24, delay: 0.42 },
+                    { points: [[38,62],[62,62],[50,78]], color: '#fdebd0', z: 22, delay: 0.45 },
+                    { points: [[25,65],[75,65],[50,88]], color: '#d35400', z: 20, delay: 0.48 },
+                    { points: [[15,75],[40,88],[8,95]], color: '#1a1a1a', z: 16, delay: 0.52 },
+                    { points: [[60,88],[85,75],[92,95]], color: '#1a1a1a', z: 16, delay: 0.55 },
+                    { points: [[32,85],[68,85],[50,98]], color: '#e67e22', z: 18, delay: 0.58 },
+                ]
+            },
+            {
+                id: 'elephant',
+                name: '亚洲象',
+                pinyin: 'YàzhōuXiàng',
+                latin: 'Elephas maximus',
+                status: '濒危',
+                statusClass: 'status-endangered',
+                count: '45,000',
+                lifespan: '60-70年',
+                weight: '3-5吨',
+                diet: '草、树皮、果实',
+                habitat: '南亚和东南亚热带森林，中国云南南部',
+                desc: '亚洲象是亚洲最大的陆地动物，高度社会化，以家族群体为单位生活，被称为"森林工程师"。',
+                bgColor: '#5d6d7e',
+                faces: [
+                    { points: [[28,8],[50,5],[40,28]], color: '#aeb6bf', z: 20, delay: 0 },
+                    { points: [[50,5],[72,8],[60,28]], color: '#aeb6bf', z: 20, delay: 0.05 },
+                    { points: [[12,15],[32,28],[15,45]], color: '#85929e', z: 18, delay: 0.08 },
+                    { points: [[68,28],[88,15],[85,45]], color: '#85929e', z: 18, delay: 0.12 },
+                    { points: [[25,28],[75,28],[50,55]], color: '#bdc3c7', z: 22, delay: 0.15 },
+                    { points: [[28,42],[50,52],[22,62]], color: '#d5d8dc', z: 20, delay: 0.18 },
+                    { points: [[50,52],[72,42],[78,62]], color: '#d5d8dc', z: 20, delay: 0.22 },
+                    { points: [[35,42],[45,42],[40,55]], color: '#2c3e50', z: 24, delay: 0.25 },
+                    { points: [[55,42],[65,42],[60,55]], color: '#2c3e50', z: 24, delay: 0.28 },
+                    { points: [[42,52],[58,52],[50,62]], color: '#5d6d7e', z: 22, delay: 0.32 },
+                    { points: [[38,58],[62,58],[50,72]], color: '#aeb6bf', z: 20, delay: 0.35 },
+                    { points: [[40,68],[60,68],[50,82]], color: '#bdc3c7', z: 18, delay: 0.38 },
+                    { points: [[42,78],[58,78],[50,92]], color: '#aeb6bf', z: 16, delay: 0.42 },
+                    { points: [[45,88],[55,88],[50,98]], color: '#85929e', z: 14, delay: 0.45 },
+                    { points: [[25,55],[42,68],[18,78]], color: '#bdc3c7', z: 16, delay: 0.48 },
+                    { points: [[58,68],[75,55],[82,78]], color: '#bdc3c7', z: 16, delay: 0.52 },
+                    { points: [[18,72],[38,88],[10,95]], color: '#85929e', z: 12, delay: 0.55 },
+                    { points: [[62,88],[82,72],[90,95]], color: '#85929e', z: 12, delay: 0.58 },
+                ]
+            },
+            {
+                id: 'penguin',
+                name: '帝企鹅',
+                pinyin: 'Dìqíé',
+                latin: 'Aptenodytes forsteri',
+                status: '易危',
+                statusClass: 'status-vulnerable',
+                count: '595,000',
+                lifespan: '15-20年',
+                weight: '22-45kg',
+                diet: '鱼类、磷虾',
+                habitat: '南极洲海冰区域，是唯一在南极冬季繁殖的企鹅',
+                desc: '帝企鹅是企鹅家族中体型最大的成员，雄性在极寒冬季孵蛋，期间不进食长达两个月。',
+                bgColor: '#154360',
+                faces: [
+                    { points: [[35,10],[65,10],[50,32]], color: '#1a1a1a', z: 22, delay: 0 },
+                    { points: [[25,15],[40,15],[32,32]], color: '#1a1a1a', z: 20, delay: 0.05 },
+                    { points: [[60,15],[75,15],[68,32]], color: '#1a1a1a', z: 20, delay: 0.08 },
+                    { points: [[18,20],[38,35],[12,48]], color: '#1a1a1a', z: 18, delay: 0.12 },
+                    { points: [[62,35],[82,20],[88,48]], color: '#1a1a1a', z: 18, delay: 0.15 },
+                    { points: [[22,30],[78,30],[50,58]], color: '#ffffff', z: 24, delay: 0.18 },
+                    { points: [[30,42],[50,55],[22,65]], color: '#fdebd0', z: 22, delay: 0.22 },
+                    { points: [[50,55],[70,42],[78,65]], color: '#fdebd0', z: 22, delay: 0.25 },
+                    { points: [[35,48],[45,48],[40,62]], color: '#1a1a1a', z: 26, delay: 0.28 },
+                    { points: [[55,48],[65,48],[60,62]], color: '#1a1a1a', z: 26, delay: 0.32 },
+                    { points: [[42,55],[58,55],[50,68]], color: '#f39c12', z: 24, delay: 0.35 },
+                    { points: [[25,58],[75,58],[50,85]], color: '#1a252f', z: 20, delay: 0.38 },
+                    { points: [[15,68],[42,85],[8,95]], color: '#1a252f', z: 16, delay: 0.42 },
+                    { points: [[58,85],[85,68],[92,95]], color: '#1a252f', z: 16, delay: 0.45 },
+                    { points: [[32,82],[68,82],[50,98]], color: '#2c3e50', z: 18, delay: 0.48 },
+                    { points: [[38,92],[50,100],[28,100]], color: '#f39c12', z: 14, delay: 0.52 },
+                    { points: [[50,100],[62,92],[72,100]], color: '#f39c12', z: 14, delay: 0.55 },
+                ]
+            },
+            {
+                id: 'dolphin',
+                name: '中华白海豚',
+                pinyin: 'ZhōnghuáBáihǎitún',
+                latin: 'Sousa chinensis',
+                status: '易危',
+                statusClass: 'status-vulnerable',
+                count: '2,500',
+                lifespan: '30-40年',
+                weight: '150-230kg',
+                diet: '鱼类、头足类',
+                habitat: '西太平洋沿岸水域，中国珠江口、厦门湾等河口区域',
+                desc: '中华白海豚被称为"水上大熊猫"，体色会随年龄增长由灰色变为粉白色。',
+                bgColor: '#4a0e1a',
+                faces: [
+                    { points: [[2,45],[18,32],[12,58]], color: '#fce4ec', z: 22, delay: 0 },
+                    { points: [[12,58],[28,42],[22,72]], color: '#f8bbd9', z: 20, delay: 0.05 },
+                    { points: [[18,32],[42,22],[35,52]], color: '#f48fb1', z: 24, delay: 0.08 },
+                    { points: [[22,72],[48,52],[42,82]], color: '#ffffff', z: 22, delay: 0.12 },
+                    { points: [[35,52],[62,38],[55,68]], color: '#f8bbd9', z: 20, delay: 0.15 },
+                    { points: [[42,82],[68,62],[62,92]], color: '#fce4ec', z: 20, delay: 0.18 },
+                    { points: [[55,68],[82,52],[75,82]], color: '#f48fb1', z: 18, delay: 0.22 },
+                    { points: [[62,92],[88,72],[82,98]], color: '#f8bbd9', z: 18, delay: 0.25 },
+                    { points: [[75,82],[92,68],[88,95]], color: '#fce4ec', z: 16, delay: 0.28 },
+                    { points: [[82,98],[95,85],[92,100]], color: '#f48fb1', z: 14, delay: 0.32 },
+                    { points: [[88,95],[98,88],[98,100]], color: '#f8bbd9', z: 12, delay: 0.35 },
+                    { points: [[25,48],[38,48],[32,58]], color: '#1a1a1a', z: 28, delay: 0.38 },
+                    { points: [[5,52],[18,68],[2,82]], color: '#f8bbd9', z: 16, delay: 0.42 },
+                    { points: [[8,62],[22,78],[5,92]], color: '#fce4ec', z: 14, delay: 0.45 },
+                ]
+            },
+            {
+                id: 'owl',
+                name: '雪鸮',
+                pinyin: 'Xuěxiāo',
+                latin: 'Bubo scandiacus',
+                status: '易危',
+                statusClass: 'status-vulnerable',
+                count: '200,000',
+                lifespan: '10年',
+                weight: '1.6-3kg',
+                diet: '旅鼠、小型哺乳动物',
+                habitat: '北极苔原地区，冬季会向南迁徙至加拿大、欧亚大陆北部',
+                desc: '雪鸮是北极地区的标志性鸟类，以其美丽的白色羽毛著称。哈利·波特中的海德薇就是一只雪鸮。',
+                bgColor: '#2c1654',
+                faces: [
+                    { points: [[28,8],[50,5],[40,28]], color: '#fef9e7', z: 20, delay: 0 },
+                    { points: [[50,5],[72,8],[60,28]], color: '#fef9e7', z: 20, delay: 0.05 },
+                    { points: [[15,12],[35,25],[18,42]], color: '#e8daef', z: 18, delay: 0.08 },
+                    { points: [[65,25],[85,12],[82,42]], color: '#e8daef', z: 18, delay: 0.12 },
+                    { points: [[12,18],[30,32],[15,48]], color: '#d7bde2', z: 16, delay: 0.15 },
+                    { points: [[70,32],[88,18],[85,48]], color: '#d7bde2', z: 16, delay: 0.18 },
+                    { points: [[22,28],[78,28],[50,58]], color: '#fef9e7', z: 24, delay: 0.22 },
+                    { points: [[28,45],[50,58],[22,72]], color: '#ffcc80', z: 22, delay: 0.25 },
+                    { points: [[50,58],[72,45],[78,72]], color: '#ffcc80', z: 22, delay: 0.28 },
+                    { points: [[32,48],[45,48],[38,62]], color: '#fef9e7', z: 26, delay: 0.32 },
+                    { points: [[55,48],[68,48],[62,62]], color: '#fef9e7', z: 26, delay: 0.35 },
+                    { points: [[35,52],[45,52],[40,62]], color: '#1a1a1a', z: 28, delay: 0.38 },
+                    { points: [[55,52],[65,52],[60,62]], color: '#1a1a1a', z: 28, delay: 0.42 },
+                    { points: [[42,60],[58,60],[50,75]], color: '#37474f', z: 24, delay: 0.45 },
+                    { points: [[25,65],[75,65],[50,88]], color: '#e8daef', z: 20, delay: 0.48 },
+                    { points: [[15,78],[42,92],[8,98]], color: '#d7bde2', z: 16, delay: 0.52 },
+                    { points: [[58,92],[85,78],[92,98]], color: '#d7bde2', z: 16, delay: 0.55 },
+                    { points: [[32,85],[68,85],[50,98]], color: '#e8daef', z: 18, delay: 0.58 },
+                ]
+            },
+            {
+                id: 'turtle',
+                name: '绿海龟',
+                pinyin: 'Lǜhǎiguī',
+                latin: 'Chelonia mydas',
+                status: '濒危',
+                statusClass: 'status-endangered',
+                count: '85,000',
+                lifespan: '80年以上',
+                weight: '65-130kg',
+                diet: '海草、藻类',
+                habitat: '热带和亚热带海域，产卵于沙滩，中国南海、东海有分布',
+                desc: '绿海龟是大型海龟，因其体内脂肪呈绿色而得名。需要长途迁徙，在出生的海滩产卵。',
+                bgColor: '#0d3d38',
+                faces: [
+                    { points: [[35,15],[65,15],[50,30]], color: '#2e7d32', z: 24, delay: 0 },
+                    { points: [[20,22],[45,32],[22,48]], color: '#388e3c', z: 22, delay: 0.05 },
+                    { points: [[55,32],[80,22],[78,48]], color: '#388e3c', z: 22, delay: 0.08 },
+                    { points: [[10,32],[30,48],[12,65]], color: '#43a047', z: 20, delay: 0.12 },
+                    { points: [[70,48],[90,32],[88,65]], color: '#43a047', z: 20, delay: 0.15 },
+                    { points: [[25,45],[75,45],[50,62]], color: '#4caf50', z: 26, delay: 0.18 },
+                    { points: [[28,58],[45,58],[36,72]], color: '#1b5e20', z: 24, delay: 0.22 },
+                    { points: [[55,58],[72,58],[64,72]], color: '#1b5e20', z: 24, delay: 0.25 },
+                    { points: [[36,68],[64,68],[50,82]], color: '#66bb6a', z: 22, delay: 0.28 },
+                    { points: [[42,55],[50,55],[46,62]], color: '#1a1a1a', z: 28, delay: 0.32 },
+                    { points: [[50,55],[58,55],[54,62]], color: '#1a1a1a', z: 28, delay: 0.35 },
+                    { points: [[50,78],[50,95],[50,95]], color: '#81c784', z: 20, delay: 0.38 },
+                    { points: [[5,48],[20,62],[2,75]], color: '#66bb6a', z: 16, delay: 0.42 },
+                    { points: [[80,62],[95,48],[98,75]], color: '#66bb6a', z: 16, delay: 0.45 },
+                    { points: [[18,68],[32,78],[15,88]], color: '#4caf50', z: 18, delay: 0.48 },
+                    { points: [[68,78],[82,68],[85,88]], color: '#4caf50', z: 18, delay: 0.52 },
+                    { points: [[5,78],[18,88],[2,98]], color: '#388e3c', z: 14, delay: 0.55 },
+                    { points: [[82,88],[95,78],[98,98]], color: '#388e3c', z: 14, delay: 0.58 },
+                ]
+            },
+            {
+                id: 'orca',
+                name: '虎鲸',
+                pinyin: 'Hǔjīng',
+                latin: 'Orcinus orca',
+                status: '濒危',
+                statusClass: 'status-endangered',
+                count: '50,000',
+                lifespan: '50-80年',
+                weight: '4-6吨',
+                diet: '鱼类、海豹',
+                habitat: '全球各大洋，从北极到南极均有分布，偏爱冷水区域',
+                desc: '虎鲸是海洋中最强大的掠食者之一，拥有极高的智商和复杂的社会结构，被称为"海洋中的狼群"。',
+                bgColor: '#002FA7',
+                faces: [
+                    { points: [[5,40],[22,25],[15,55]], color: '#1a1a1a', z: 22, delay: 0 },
+                    { points: [[15,55],[30,38],[25,68]], color: '#2d2d2d', z: 20, delay: 0.05 },
+                    { points: [[22,25],[45,15],[35,42]], color: '#1a1a1a', z: 24, delay: 0.08 },
+                    { points: [[25,68],[50,48],[45,78]], color: '#1a1a1a', z: 22, delay: 0.12 },
+                    { points: [[35,42],[60,30],[50,58]], color: '#2d2d2d', z: 20, delay: 0.15 },
+                    { points: [[45,78],[70,58],[65,88]], color: '#1a1a1a', z: 20, delay: 0.18 },
+                    { points: [[50,58],[75,45],[68,75]], color: '#2d2d2d', z: 18, delay: 0.22 },
+                    { points: [[65,88],[85,68],[82,95]], color: '#1a1a1a', z: 18, delay: 0.25 },
+                    { points: [[68,75],[88,62],[85,85]], color: '#2d2d2d', z: 16, delay: 0.28 },
+                    { points: [[32,52],[48,52],[40,68]], color: '#1a1a1a', z: 26, delay: 0.32 },
+                    { points: [[52,52],[68,52],[60,68]], color: '#1a1a1a', z: 26, delay: 0.35 },
+                    { points: [[38,58],[50,58],[44,72]], color: '#fef9e7', z: 28, delay: 0.38 },
+                    { points: [[50,58],[62,58],[56,72]], color: '#fef9e7', z: 28, delay: 0.42 },
+                    { points: [[85,85],[95,75],[95,95]], color: '#2d2d2d', z: 14, delay: 0.45 },
+                    { points: [[8,62],[25,82],[2,95]], color: '#fef9e7', z: 16, delay: 0.48 },
+                    { points: [[85,62],[95,52],[98,78]], color: '#fef9e7', z: 16, delay: 0.52 },
+                ]
+            },
+            {
+                id: 'snowleopard',
+                name: '雪豹',
+                pinyin: 'Xuěbào',
+                latin: 'Panthera uncia',
+                status: '易危',
+                statusClass: 'status-vulnerable',
+                count: '4,500',
+                lifespan: '15-18年',
+                weight: '35-55kg',
+                diet: '岩羊、盘羊',
+                habitat: '中亚高山地区，中国西藏、新疆、青海等地的雪线附近',
+                desc: '雪豹被称为"雪山之王"，是高山生态系统的旗舰物种。它们拥有厚实的皮毛和长尾巴。',
+                bgColor: '#1e3a5f',
+                faces: [
+                    { points: [[30,5],[50,2],[40,18]], color: '#e8e8e8', z: 22, delay: 0 },
+                    { points: [[50,2],[70,5],[60,18]], color: '#e8e8e8', z: 22, delay: 0.05 },
+                    { points: [[18,8],[35,18],[22,32]], color: '#d0d0d0', z: 20, delay: 0.08 },
+                    { points: [[65,18],[82,8],[78,32]], color: '#d0d0d0', z: 20, delay: 0.12 },
+                    { points: [[12,12],[28,22],[15,38]], color: '#1a1a1a', z: 18, delay: 0.15 },
+                    { points: [[72,22],[88,12],[85,38]], color: '#1a1a1a', z: 18, delay: 0.18 },
+                    { points: [[25,22],[75,22],[50,48]], color: '#d8d8d8', z: 24, delay: 0.22 },
+                    { points: [[22,35],[50,48],[18,55]], color: '#e0e0e0', z: 22, delay: 0.25 },
+                    { points: [[50,48],[78,35],[82,55]], color: '#e0e0e0', z: 22, delay: 0.28 },
+                    { points: [[35,38],[48,38],[42,52]], color: '#fef9e7', z: 26, delay: 0.32 },
+                    { points: [[52,38],[65,38],[58,52]], color: '#fef9e7', z: 26, delay: 0.35 },
+                    { points: [[42,45],[58,45],[50,58]], color: '#1a1a1a', z: 28, delay: 0.38 },
+                    { points: [[32,52],[68,52],[50,72]], color: '#c8c8c8', z: 24, delay: 0.42 },
+                    { points: [[38,62],[62,62],[50,78]], color: '#d0d0d0', z: 22, delay: 0.45 },
+                    { points: [[25,65],[75,65],[50,88]], color: '#b8b8b8', z: 20, delay: 0.48 },
+                    { points: [[15,75],[40,88],[8,95]], color: '#1a1a1a', z: 16, delay: 0.52 },
+                    { points: [[60,88],[85,75],[92,95]], color: '#1a1a1a', z: 16, delay: 0.55 },
+                    { points: [[32,85],[68,85],[50,98]], color: '#c0c0c0', z: 18, delay: 0.58 },
+                ]
+            },
+            {
+                id: 'goldenmonkey',
+                name: '川金丝猴',
+                pinyin: 'ChuānJīnsīhóu',
+                latin: 'Rhinopithecus roxellana',
+                status: '濒危',
+                statusClass: 'status-endangered',
+                count: '15,000',
+                lifespan: '20-25年',
+                weight: '6-20kg',
+                diet: '树叶、果实、嫩芽',
+                habitat: '中国中部高山森林，主要分布在四川、甘肃、陕西、湖北',
+                desc: '川金丝猴是中国特有的珍稀灵长类动物，以其美丽的金色毛发著称，被誉为"雪山精灵"。',
+                bgColor: '#3e2723',
+                faces: [
+                    { points: [[28,5],[50,2],[40,22]], color: '#ffb300', z: 22, delay: 0 },
+                    { points: [[50,2],[72,5],[60,22]], color: '#ffb300', z: 22, delay: 0.05 },
+                    { points: [[15,10],[35,22],[18,38]], color: '#ffc107', z: 20, delay: 0.08 },
+                    { points: [[65,22],[85,10],[82,38]], color: '#ffc107', z: 20, delay: 0.12 },
+                    { points: [[22,25],[78,25],[50,55]], color: '#ffe0b2', z: 24, delay: 0.15 },
+                    { points: [[28,38],[50,48],[22,58]], color: '#fff3e0', z: 22, delay: 0.18 },
+                    { points: [[50,48],[72,38],[78,58]], color: '#fff3e0', z: 22, delay: 0.22 },
+                    { points: [[30,35],[45,35],[38,50]], color: '#1a1a1a', z: 26, delay: 0.25 },
+                    { points: [[55,35],[70,35],[62,50]], color: '#1a1a1a', z: 26, delay: 0.28 },
+                    { points: [[35,48],[50,48],[42,62]], color: '#5d4037', z: 24, delay: 0.32 },
+                    { points: [[50,48],[65,48],[58,62]], color: '#5d4037', z: 24, delay: 0.35 },
+                    { points: [[42,55],[58,55],[50,68]], color: '#ffcc80', z: 22, delay: 0.38 },
+                    { points: [[38,62],[62,62],[50,78]], color: '#ffe0b2', z: 20, delay: 0.42 },
+                    { points: [[25,58],[75,58],[50,85]], color: '#ff9800', z: 18, delay: 0.45 },
+                    { points: [[15,68],[42,85],[8,95]], color: '#e65100', z: 16, delay: 0.48 },
+                    { points: [[58,85],[85,68],[92,95]], color: '#e65100', z: 16, delay: 0.52 },
+                    { points: [[32,82],[68,82],[50,98]], color: '#ffb300', z: 18, delay: 0.55 },
+                ]
+            }
+        ];
+
+        let currentSlide = 0;
+        const totalSlides = speciesData.length;
+
+        function createSlides() {
+            const container = document.getElementById('mainContainer');
+            const navDots = document.getElementById('navDots');
+
+            const introSlide = document.createElement('div');
+            introSlide.className = 'slide intro-slide active';
+            introSlide.innerHTML = `
+                <div class="intro-left">
+                    <div class="intro-header">
+                        <h1 class="intro-title">濒危物种</h1>
+                        <p class="intro-subtitle">这些动物正在濒危灭绝</p>
+                    </div>
+                    <p class="intro-message">每一个物种都是地球生命网络中不可或缺的一环，它们的消失，将是我们永远的遗憾</p>
+                    <button class="start-btn" onclick="goToSlide(1); playClickSound();">开始探索 →</button>
+                </div>
+                <div class="intro-right">
+                    <div class="intro-scene">
+                        <div class="lp-mountain-far lp-mt-far-1"></div>
+                        <div class="lp-mountain-far lp-mt-far-2"></div>
+                        <div class="lp-mountain-far lp-mt-far-3"></div>
+                        <div class="lp-mountain-near lp-mt-near-1"></div>
+                        <div class="lp-mountain-near lp-mt-near-2"></div>
+                        <div class="lp-water">
+                            <div class="lp-water-triangle lp-w-1"></div>
+                            <div class="lp-water-triangle lp-w-2"></div>
+                            <div class="lp-water-triangle lp-w-3"></div>
+                            <div class="lp-water-triangle lp-w-4"></div>
+                            <div class="lp-water-triangle lp-w-5"></div>
+                        </div>
+                        <div class="lp-pine lp-pine-1">
+                            <div class="lp-pine-top"></div>
+                            <div class="lp-pine-mid"></div>
+                            <div class="lp-pine-base"></div>
+                            <div class="lp-pine-trunk"></div>
+                        </div>
+                        <div class="lp-pine lp-pine-2">
+                            <div class="lp-pine-top"></div>
+                            <div class="lp-pine-mid"></div>
+                            <div class="lp-pine-base"></div>
+                            <div class="lp-pine-trunk"></div>
+                        </div>
+                        <div class="lp-pine lp-pine-3">
+                            <div class="lp-pine-top"></div>
+                            <div class="lp-pine-mid"></div>
+                            <div class="lp-pine-base"></div>
+                            <div class="lp-pine-trunk"></div>
+                        </div>
+                        <div class="lp-pine lp-pine-4">
+                            <div class="lp-pine-top"></div>
+                            <div class="lp-pine-mid"></div>
+                            <div class="lp-pine-base"></div>
+                            <div class="lp-pine-trunk"></div>
+                        </div>
+                        <div class="lp-bamboo lp-bamboo-1">
+                            <div class="lp-bamboo-segment"></div>
+                            <div class="lp-bamboo-segment"></div>
+                            <div class="lp-bamboo-segment"></div>
+                            <div class="lp-bamboo-leaf"></div>
+                        </div>
+                        <div class="lp-bamboo lp-bamboo-2">
+                            <div class="lp-bamboo-segment"></div>
+                            <div class="lp-bamboo-segment"></div>
+                            <div class="lp-bamboo-segment"></div>
+                            <div class="lp-bamboo-segment"></div>
+                            <div class="lp-bamboo-leaf"></div>
+                        </div>
+                        <div class="lp-bamboo lp-bamboo-3">
+                            <div class="lp-bamboo-segment"></div>
+                            <div class="lp-bamboo-segment"></div>
+                            <div class="lp-bamboo-segment"></div>
+                            <div class="lp-bamboo-leaf"></div>
+                        </div>
+                        <div class="lp-tree lp-tree-1">
+                            <div class="lp-tree-crown"></div>
+                            <div class="lp-tree-trunk"></div>
+                        </div>
+                        <div class="lp-tree lp-tree-2">
+                            <div class="lp-tree-crown"></div>
+                            <div class="lp-tree-trunk"></div>
+                        </div>
+                        <div class="intro-animals" id="introAnimals"></div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(introSlide);
+
+            const introAnimals = document.getElementById('introAnimals');
+            speciesData.forEach((species, index) => {
+                const animalDiv = document.createElement('div');
+                animalDiv.className = 'intro-animal';
+                animalDiv.onclick = () => { goToSlide(index + 1); playClickSound(); };
+                animalDiv.innerHTML = `
+                    <div class="intro-animal-wrapper">
+                        <div class="animal-wrapper floating" style="width: 65px; height: 65px;">
+                            ${species.faces.map((f, i) => 
+                                `<div class="poly-face" style="
+                                    width: 0;
+                                    height: 0;
+                                    border-left: ${getFaceSize(f.points).left * 0.145}px solid transparent;
+                                    border-right: ${getFaceSize(f.points).right * 0.145}px solid transparent;
+                                    border-bottom: ${getFaceSize(f.points).bottom * 0.145}px solid ${f.color};
+                                    left: ${getFacePos(f.points).x}%;
+                                    top: ${getFacePos(f.points).y}%;
+                                    opacity: 1;
+                                    transform: translateZ(${f.z * 0.35}px);
+                                "></div>`
+                            ).join('')}
+                        </div>
+                        <div class="animal-label">${species.name}</div>
+                    </div>
+                `;
+                introAnimals.appendChild(animalDiv);
+            });
+
+            const introDot = document.createElement('div');
+            introDot.className = 'nav-dot active';
+            introDot.onclick = () => goToSlide(0);
+            navDots.appendChild(introDot);
+
+            speciesData.forEach((species, index) => {
+                const slide = document.createElement('div');
+                slide.className = 'slide';
+                slide.dataset.bgColor = species.bgColor;
+                slide.innerHTML = `
+                    <div class="slide-content">
+                        <div class="animal-stage">
+                            <div class="animal-wrapper floating" id="animal-${species.id}">
+                                ${species.faces.map((f, i) => 
+                                    `<div class="poly-face" data-index="${i}" style="
+                                        width: 0;
+                                        height: 0;
+                                        border-left: ${getFaceSize(f.points).left}px solid transparent;
+                                        border-right: ${getFaceSize(f.points).right}px solid transparent;
+                                        border-bottom: ${getFaceSize(f.points).bottom}px solid ${f.color};
+                                        left: ${getFacePos(f.points).x}%;
+                                        top: ${getFacePos(f.points).y}%;
+                                        transition-delay: ${f.delay}s;
+                                        transform: translateZ(${f.z}px);
+                                    "></div>`
+                                ).join('')}
+                            </div>
+                        </div>
+                        <div class="info-panel">
+                            <div class="species-number">${String(index + 1).padStart(2, '0')}</div>
+                            <h1 class="species-title">${species.name} <span class="species-pinyin">(${species.pinyin || ''})</span></h1>
+                            <p class="species-latin">${species.latin}</p>
+                            <span class="status-badge ${species.statusClass}">${species.status}</span>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">野生数量</div>
+                                    <div class="info-value highlight">${species.count}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">寿命</div>
+                                    <div class="info-value">${species.lifespan}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">体重</div>
+                                    <div class="info-value">${species.weight}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">食性</div>
+                                    <div class="info-value">${species.diet}</div>
+                                </div>
+                            </div>
+                            <p class="species-desc">${species.desc}</p>
+                            <div class="habitat-section">
+                                <div class="habitat-title">栖息地</div>
+                                <div class="habitat-value">${species.habitat}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(slide);
+
+                const dot = document.createElement('div');
+                dot.className = 'nav-dot';
+                dot.onclick = () => { goToSlide(index + 1); playClickSound(); };
+                navDots.appendChild(dot);
+            });
+
+            updateProgress();
+            addClickEffects();
+        }
+
+        function getFaceSize(points) {
+            const xs = points.map(p => p[0]);
+            const ys = points.map(p => p[1]);
+            const base = Math.max(...xs) - Math.min(...xs);
+            const height = Math.max(...ys) - Math.min(...ys);
+            return {
+                left: base / 2 * 4.5,
+                right: base / 2 * 4.5,
+                bottom: height * 4.5
+            };
+        }
+
+        function getFacePos(points) {
+            const xs = points.map(p => p[0]);
+            const ys = points.map(p => p[1]);
+            return { x: Math.min(...xs), y: Math.min(...ys) };
+        }
+
+        function updateBackground() {
+            const slide = document.querySelector('.slide.active');
+            if (slide && slide.dataset.bgColor) {
+                document.body.style.backgroundColor = slide.dataset.bgColor;
+                document.body.style.color = '#fff';
+            } else {
+                document.body.style.backgroundColor = '#fff';
+                document.body.style.color = '#333';
+            }
+        }
+
+        function goToSlide(index) {
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.nav-dot');
+            const navArrows = document.getElementById('navArrows');
+            
+            slides[currentSlide].classList.remove('active');
+            dots[currentSlide].classList.remove('active');
+            
+            currentSlide = index;
+            
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+            
+            updateCounter();
+            updateProgress();
+            updateBackground();
+            
+            if (index === 0) {
+                navArrows.style.display = 'none';
+            } else {
+                navArrows.style.display = 'flex';
+                const speciesIndex = index - 1;
+                if (speciesIndex >= 0 && speciesIndex < speciesData.length) {
+                    playAnimalSound(speciesData[speciesIndex].id);
+                }
+            }
+        }
+
+        function nextSlide() {
+            goToSlide((currentSlide + 1) % (totalSlides + 1));
+        }
+
+        function prevSlide() {
+            goToSlide((currentSlide - 1 + totalSlides + 1) % (totalSlides + 1));
+        }
+
+        function updateCounter() {
+            document.querySelector('.counter .current').textContent = currentSlide === 0 ? '00' : String(currentSlide).padStart(2, '0');
+        }
+
+        function updateProgress() {
+            document.getElementById('progressBar').style.width = `${(currentSlide / (totalSlides + 1)) * 100}%`;
+        }
+
+        function addClickEffects() {
+            document.addEventListener('click', (e) => {
+                const ripple = document.createElement('div');
+                ripple.className = 'click-ripple';
+                ripple.style.left = (e.clientX - 40) + 'px';
+                ripple.style.top = (e.clientY - 40) + 'px';
+                document.body.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+
+                for (let i = 0; i < 3; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = e.clientX + 'px';
+                    particle.style.top = e.clientY + 'px';
+                    particle.style.width = '4px';
+                    particle.style.height = '4px';
+                    particle.style.background = currentSlide === 0 ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.3)';
+                    particle.style.transform = `translate(${(Math.random() - 0.5) * 60}px, ${(Math.random() - 0.5) * 60}px)`;
+                    document.body.appendChild(particle);
+                    setTimeout(() => particle.remove(), 800);
+                }
+            });
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextSlide();
+            else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prevSlide();
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; });
+        document.addEventListener('touchend', (e) => {
+            const diff = touchStartX - e.changedTouches[0].screenX;
+            if (Math.abs(diff) > 50) diff > 0 ? nextSlide() : prevSlide();
+        });
+
+        createSlides();
+    </script>
+</body>
+</html>
